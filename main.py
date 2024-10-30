@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import QApplication, QWidget, QPushButton
 from PyQt6.QtWidgets import QLabel, QLineEdit, QLCDNumber
 
 
-class RandomString(QWidget):
+class Window1(QWidget):
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -72,20 +72,25 @@ class RandomString(QWidget):
         self.LCD_count.display(self.count)
 
     def dobav(self):
-        con = sqlite3.connect("proekt.sqlite")
-        cur = con.cursor()
-        cur.execute("UPDATE pervaya SET информация = ? WHERE номер = ?", (self.text_dob.text(),self.count))
+        self.name2 = str(self.text_dob.text())
+        self.w2 = Window2()
+        self.w2.show()
 
     def el_pokaz(self):
-        con = sqlite3.connect("proekt.sqlite")
-        cur = con.cursor()
-        cur.execute("SELECT pervaya.информация FROM pervaya")
-        results = list(cur.fetchall())
+        pass
 
+class Window2(Window1):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
 
+    def initUI(self):
+        self.setGeometry(300, 300, 400, 400)
+        self.setWindowTitle(self.name2)
+        self.dob = QPushButton("123", self)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = RandomString()
+    ex = Window1()
     ex.show()
     sys.exit(app.exec())
