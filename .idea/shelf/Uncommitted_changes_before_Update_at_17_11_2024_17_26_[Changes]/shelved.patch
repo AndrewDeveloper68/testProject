@@ -1,0 +1,228 @@
+Index: main.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import sys\r\nimport sqlite3\r\nfrom PyQt6.QtWidgets import QApplication, QWidget, QPushButton\r\nfrom PyQt6.QtWidgets import QLabel, QLineEdit, QLCDNumber\r\n\r\n\r\nclass Window1(QWidget):\r\n    def __init__(self):\r\n        super().__init__()\r\n        self.initUI()\r\n\r\n    def initUI(self):\r\n        self.setGeometry(300, 300, 400, 400)\r\n        self.setWindowTitle('ну очень крутой проект')\r\n        self.dob = QPushButton(\"вставить элемент\", self)\r\n        self.dob.move(20, 20)\r\n        self.dob.resize(120, 50)\r\n        self.dob.clicked.connect(self.dobav)\r\n        self.text_dob = QLineEdit(self)\r\n        self.text_dob.move(160, 20)\r\n        self.text_dob.resize(200, 50)\r\n        self.pokaz = QPushButton(\"вывести элемент\", self)\r\n        self.pokaz.move(20, 220)\r\n        self.pokaz.resize(120, 50)\r\n        self.pokaz.clicked.connect(self.el_pokaz)\r\n        self.text_pokaz = QLineEdit(self)\r\n        self.text_pokaz.move(160, 220)\r\n        self.text_pokaz.resize(200, 50)\r\n        self.left = QPushButton('<', self)\r\n        self.left.resize(50, 50)\r\n        self.left.move(100, 100)\r\n        self.left.clicked.connect(self.lev_click)\r\n        self.right = QPushButton('>', self)\r\n        self.right.resize(50, 50)\r\n        self.right.move(225, 100)\r\n        self.right.clicked.connect(self.prav_click)\r\n        self.super_left = QPushButton('<<', self)\r\n        self.super_left.resize(25, 25)\r\n        self.super_left.move(80, 113)\r\n        self.super_left.clicked.connect(self.superlev_click)\r\n        self.super_right = QPushButton('>>', self)\r\n        self.super_right.resize(25, 25)\r\n        self.super_right.move(270, 113)\r\n        self.super_right.clicked.connect(self.superprav_click)\r\n        self.LCD_count = QLCDNumber(self)\r\n        self.LCD_count.resize(75, 60)\r\n        self.LCD_count.move(150, 90)\r\n        self.count = 0\r\n\r\n    def lev_click(self):\r\n        if self.count != 0:\r\n            self.count -= 1\r\n        self.LCD_count.display(self.count)\r\n\r\n    def prav_click(self):\r\n        if self.count + 1 < 1000:\r\n            self.count += 1\r\n        self.LCD_count.display(self.count)\r\n\r\n    def superprav_click(self):\r\n        if self.count + 10 < 1000:\r\n            self.count += 10\r\n        else:\r\n            self.count = 999\r\n        self.LCD_count.display(self.count)\r\n\r\n    def superlev_click(self):\r\n        if self.count - 10 >= 0:\r\n            self.count -= 10\r\n        else:\r\n            self.count = 0\r\n        self.LCD_count.display(self.count)\r\n\r\n    def dobav(self):\r\n        self.name2 = str(self.text_dob.text())\r\n        self.w2 = Window2()\r\n        self.w2.show()\r\n\r\n    def el_pokaz(self):\r\n        pass\r\n\r\nclass Window2(Window1):\r\n    def __init__(self):\r\n        super().__init__()\r\n        self.initUI()\r\n\r\n    def initUI(self):\r\n        self.setGeometry(300, 300, 400, 400)\r\n        self.setWindowTitle(self.name2)\r\n        self.dob = QPushButton(\"123\", self)\r\n\r\nif __name__ == '__main__':\r\n    app = QApplication(sys.argv)\r\n    ex = Window1()\r\n    ex.show()\r\n    sys.exit(app.exec())\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.py b/main.py
+--- a/main.py	(revision ca3a3ebd469558934485d0bcfe85a2d8879925f1)
++++ b/main.py	(date 1731853130536)
+@@ -1,96 +1,137 @@
+ import sys
+-import sqlite3
+-from PyQt6.QtWidgets import QApplication, QWidget, QPushButton
+-from PyQt6.QtWidgets import QLabel, QLineEdit, QLCDNumber
++from PyQt6.QtWidgets import (
++    QApplication,
++    QMainWindow,
++    QWidget,
++    QPushButton,
++    QVBoxLayout,
++    QLabel,
++    QTextEdit,
++    QMessageBox,
++    QGridLayout,
++    QSizePolicy,
++    QDialog,
++)
++
+ 
++class NoteWindow(QDialog):
++    def __init__(self, title="", text="", on_save=None):
++        super().__init__()
++        self.setWindowTitle("Заметка")
++        self.on_save = on_save
+ 
+-class Window1(QWidget):
++        # Поля для редактирования заголовка и текста заметки
++        self.title_edit = QTextEdit()
++        self.title_edit.setText(title)
++        self.text_edit = QTextEdit()
++        self.text_edit.setText(text)
++
++        # Кнопки для сохранения и удаления заметки
++        self.save_button = QPushButton("Сохранить")
++        self.save_button.clicked.connect(self.save_note)
++
++        self.delete_button = QPushButton("Удалить")
++        self.delete_button.clicked.connect(self.delete_note)
++
++        # Установка макета
++        layout = QVBoxLayout()
++        layout.addWidget(QLabel("Заголовок:"))
++        layout.addWidget(self.title_edit)
++        layout.addWidget(QLabel("Текст:"))
++        layout.addWidget(self.text_edit)
++        layout.addWidget(self.save_button)
++        layout.addWidget(self.delete_button)
++
++        self.setLayout(layout)
++
++    def save_note(self):
++        title = self.title_edit.toPlainText().strip()  # Получаем заголовок
++        text = self.text_edit.toPlainText()  # Получаем текст заметки
++        if self.on_save:
++            self.on_save(title, text)  # Вызов функции сохранения из MainWindow
++        self.accept()  # Закрытие окна заметки
++
++    def delete_note(self):
++        reply = QMessageBox.question(
++            self, "Удаление", "Вы точно хотите удалить заметку?",
++            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
++        )
++        if reply == QMessageBox.StandardButton.Yes:
++            if self.on_save:
++                self.on_save(self.title_edit.toPlainText(), None, delete=True)  # Удаление
++            self.accept()  # Закрытие окна заметки
++
++
++class MainWindow(QMainWindow):
+     def __init__(self):
+         super().__init__()
+-        self.initUI()
++        self.setWindowTitle("Проект")
++
++        # Глобальный набор заметок
++        self.notes = []
++
++        self.layout = QGridLayout()
++        self.display_notes()  # Отображение заметок
++
++        self.create_note_button = QPushButton("Создать новую заметку")
++        self.create_note_button.clicked.connect(self.create_new_note)
++
++        self.layout.addWidget(self.create_note_button, 0, 0)  # Добавление кнопки в макет
+ 
+-    def initUI(self):
+-        self.setGeometry(300, 300, 400, 400)
+-        self.setWindowTitle('ну очень крутой проект')
+-        self.dob = QPushButton("вставить элемент", self)
+-        self.dob.move(20, 20)
+-        self.dob.resize(120, 50)
+-        self.dob.clicked.connect(self.dobav)
+-        self.text_dob = QLineEdit(self)
+-        self.text_dob.move(160, 20)
+-        self.text_dob.resize(200, 50)
+-        self.pokaz = QPushButton("вывести элемент", self)
+-        self.pokaz.move(20, 220)
+-        self.pokaz.resize(120, 50)
+-        self.pokaz.clicked.connect(self.el_pokaz)
+-        self.text_pokaz = QLineEdit(self)
+-        self.text_pokaz.move(160, 220)
+-        self.text_pokaz.resize(200, 50)
+-        self.left = QPushButton('<', self)
+-        self.left.resize(50, 50)
+-        self.left.move(100, 100)
+-        self.left.clicked.connect(self.lev_click)
+-        self.right = QPushButton('>', self)
+-        self.right.resize(50, 50)
+-        self.right.move(225, 100)
+-        self.right.clicked.connect(self.prav_click)
+-        self.super_left = QPushButton('<<', self)
+-        self.super_left.resize(25, 25)
+-        self.super_left.move(80, 113)
+-        self.super_left.clicked.connect(self.superlev_click)
+-        self.super_right = QPushButton('>>', self)
+-        self.super_right.resize(25, 25)
+-        self.super_right.move(270, 113)
+-        self.super_right.clicked.connect(self.superprav_click)
+-        self.LCD_count = QLCDNumber(self)
+-        self.LCD_count.resize(75, 60)
+-        self.LCD_count.move(150, 90)
+-        self.count = 0
++        container = QWidget()
++        container.setLayout(self.layout)
++        self.setCentralWidget(container)
+ 
+-    def lev_click(self):
+-        if self.count != 0:
+-            self.count -= 1
+-        self.LCD_count.display(self.count)
++    def display_notes(self):
++        # Очистка старых кнопок перед обновлением
++        while self.layout.count() > 1:  # Учтем кнопку создания заметки
++            widget = self.layout.takeAt(1)  # Удаляем старые кнопки заметок
++            if widget.widget():
++                widget.widget().deleteLater()
+ 
+-    def prav_click(self):
+-        if self.count + 1 < 1000:
+-            self.count += 1
+-        self.LCD_count.display(self.count)
++        for i, note in enumerate(self.notes):
++            button = QPushButton(note['title'])
++            button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
++            button.clicked.connect(lambda _, n=note: self.open_note_window(n))
++            self.layout.addWidget(button, i + 1, 0)  # Индекс увеличивается на 1 для кнопок заметок
+ 
+-    def superprav_click(self):
+-        if self.count + 10 < 1000:
+-            self.count += 10
++    def create_new_note(self):
++        note_window = NoteWindow(on_save=self.save_note)
++        note_window.exec()  # Используем exec для открытия диалога модально
++
++    def open_note_window(self, note):
++        note_window = NoteWindow(title=note['title'], text=note['text'], on_save=self.save_note)
++        note_window.exec()  # Используем exec для открытия диалога модально
++
++    def save_note(self, title, text, delete=False):
++        if delete:
++            # Удаляем заметку
++            self.notes = [note for note in self.notes if note['title'] != title]
++            QMessageBox.information(self, "Успех", f"Заметка '{title}' успешно удалена.")  # Уведомление о удалении
+         else:
+-            self.count = 999
+-        self.LCD_count.display(self.count)
+-
+-    def superlev_click(self):
+-        if self.count - 10 >= 0:
+-            self.count -= 10
+-        else:
+-            self.count = 0
+-        self.LCD_count.display(self.count)
++            # Сохранение или обновление заметки
++            if title and text:  # Проверка на пустые значения
++                for note in self.notes:
++                    if note['title'] == title:
++                        note['text'] = text
++                        QMessageBox.information(self, "Успех",
++                                                f"Заметка '{title}' обновлена.")  # Уведомление об обновлении
++                        break
++                else:
++                    self.notes.append({"title": title, "text": text})
++                    QMessageBox.information(self, "Успех",
++                                            f"Добавлена новая заметка: '{title}'.")  # Уведомление о добавлении
+ 
+-    def dobav(self):
+-        self.name2 = str(self.text_dob.text())
+-        self.w2 = Window2()
+-        self.w2.show()
++        # Обновление отображения заметок
++        self.update_note_display()
+ 
+-    def el_pokaz(self):
+-        pass
++    def update_note_display(self):
++        # Обновляем отображение заметок
++        self.display_notes()
+ 
+-class Window2(Window1):
+-    def __init__(self):
+-        super().__init__()
+-        self.initUI()
+ 
+-    def initUI(self):
+-        self.setGeometry(300, 300, 400, 400)
+-        self.setWindowTitle(self.name2)
+-        self.dob = QPushButton("123", self)
+-
+-if __name__ == '__main__':
++if __name__ == "__main__":
+     app = QApplication(sys.argv)
+-    ex = Window1()
+-    ex.show()
++    main_window = MainWindow()
++    main_window.show()
+     sys.exit(app.exec())
